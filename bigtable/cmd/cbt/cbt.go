@@ -35,6 +35,7 @@ import (
 	"time"
 
 	"encoding/csv"
+	"encoding/base64"
 
 	"cloud.google.com/go/bigtable"
 	"cloud.google.com/go/bigtable/internal/cbtconfig"
@@ -949,7 +950,11 @@ func printRow(r bigtable.Row) {
 		for _, ri := range ris {
 			ts := time.Unix(0, int64(ri.Timestamp)*1e3)
 			fmt.Printf("  %-40s @ %s\n", ri.Column, ts.Format("2006/01/02-15:04:05.000000"))
-			fmt.Printf("    %q\n", ri.Value)
+			if config.OutputBase64 {
+				fmt.Printf("    %s\n", base64.StdEncoding.EncodeToString(ri.Value))
+			} else {
+				fmt.Printf("    %q\n", ri.Value)
+			}
 		}
 	}
 }
